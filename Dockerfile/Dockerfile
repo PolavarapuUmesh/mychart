@@ -1,8 +1,9 @@
-FROM nginx:1.25.5
-LABEL maintainer"umeshpolavarapu71@gmail.com"LABEL version="1.25.5"
-RUN apt-get update && apt-get install -y nginx
-WORKDIR /home/umesh/Desktop
-CMD ["sleep","1000"]
+FROM python:3.9
+LABEL maintainer="umeshpolavarapu71@gmail.com"
+RUN pip install requests beautifulsoup4
+WORKDIR /home/umesh/mychart/Dockerfile
+CMD ["python", "app.py"]
 VOLUME /var/lib
 EXPOSE 80
+
 
