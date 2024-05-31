@@ -53,7 +53,7 @@ ingress:
   hosts:
     - host: umeshved.life
       paths:
-        - path: /
+        - path: /game
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
