@@ -1,6 +1,7 @@
 apiVersion: v2
 name: snake-game-app
-description: A Helm chart for my snake game which the language is written in python
+
+description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
 #
