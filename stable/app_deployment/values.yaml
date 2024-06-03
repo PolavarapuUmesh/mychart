@@ -25,9 +25,8 @@ pod:
     "prometheus.io/port": "80"
     "prometheus.io/scrape": "true"
 image:
-  repository: 617558729962.dkr.ecr.ap-south-1.amazonaws.com/vedantu-registry
-  bucketName: sample-app
-  tag: f24cd18ca0b7971c37e529e567825728011e737f
+  repository: 058264528338.dkr.ecr.us-east-1.amazonaws.com/snake_game 
+  tag: latest
   pullPolicy: Always
 # resources:
 #   limits:
