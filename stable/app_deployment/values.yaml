@@ -85,4 +85,4 @@ config:
   INGRESS_HOSTNAME_DOMAIN: ""
   INGRESS_PATH_TYPE: "ImplementationSpecific"
   INGRESS_PATH: "/"
-  SERVICE_ACCOUNT: "true"
+  SERVICE_ACCOUNT: "false"
