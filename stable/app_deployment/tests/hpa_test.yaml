@@ -1,0 +1,36 @@
+suite: test hpa
+templates:
+  - hpa.yaml
+tests:
+  - it: check hpa when enabled
+    set:
+      config.HPA_ENABLED: "true"
+    asserts:
+      - isKind:
+          of: HorizontalPodAutoscaler
+      - isAPIVersion: 
+          of: autoscaling/v2beta2
+      - isNotEmpty:
+          path: spec
+  
+  - it: check resources were set when hpa enabled
+    set:
+      config.HPA_ENABLED: "true"
+    asserts:
+      - isKind:
+          of: HorizontalPodAutoscaler
+      - isNotEmpty:
+          path: spec.minReplicas
+  
+  - it: check resources overriding when hpa enabled
+    set:
+      config.HPA_ENABLED: "true"
+      config.HPA_MIN_REPLICA: 5
+      config.HPA_MAX_REPLICA: 20
+    asserts:
+      - equal:
+          path: spec.minReplicas
+          value: 5
+      - equal:
+          path: spec.maxReplicas
+          value: 20

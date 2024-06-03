@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: snakegame
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PolavarapuUmesh/mychart.git
+    targetRevision: HEAD
+    chart: mychart # The name of the Helm chart in the mychart repo
+    helm:
+      values: |
+        image:
+          repository: 058264528338.dkr.ecr.us-east-1.amazonaws.com/snake_game
+          tag: latest
+        appConfig:
+          repoURL: umeshved.life
+          targetRevision: HEAD
+          path: /game
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+

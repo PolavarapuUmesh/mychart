@@ -1,0 +1,9 @@
+----------------------------------------------------------------
+Thank you for installing {{ include "app-deployment.fullname" . }} with chart {{ .Chart.Name }}
+
+Your release is named {{ include "app-deployment.fullname" . }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ include "app-deployment.fullname" . }}
+  $ helm get all {{ include "app-deployment.fullname" . }}

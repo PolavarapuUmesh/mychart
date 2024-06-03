@@ -1,0 +1,85 @@
+suite: test deployment
+templates:
+  - deployment.yaml
+  - configmap.yaml
+tests:
+  - it: check deployment name and image tag
+    set:
+      image.tag: latest
+      image.bucketName: test
+    asserts:
+      - isKind:
+          of: Deployment
+      - isAPIVersion: 
+          of: apps/v1
+      - matchRegex:
+          path: metadata.name
+          pattern: RELEASE-NAME
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 617558729962.dkr.ecr.ap-south-1.amazonaws.com/vedantu-registry:test-latest
+  
+  - it: check pod replicas overriding
+    set:
+      config.KUBERNETES_REPLICAS: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: check service account name
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: "RELEASE-NAME-NAMESPACE-sa"
+
+  - it: ensure that cpu/memory resources were set
+    asserts:
+      - isNotEmpty:
+          path: spec.template.spec.containers[0].resources
+
+  - it: ensure that HTTP_PROBE_PATH is present when probe enabled
+    set:
+      config.HTTP_PROBE_ENABLED: "true"
+    asserts:
+      - isNotEmpty:
+          path: spec.template.spec.containers[0].livenessProbe
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: "/ping"
+
+  - it: check deployment release is stable
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/release: stable
+            app.kubernetes.io/team: SRE
+            app.kubernetes.io/version: 1.2.0
+            helm.sh/chart: app-deployment-0.2.0
+
+  - it: check deployment release is canary
+    set:
+      app.release: "canary"
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/release: canary
+            app.kubernetes.io/team: SRE
+            app.kubernetes.io/version: 1.2.0
+            helm.sh/chart: app-deployment-0.2.0
+
+  - it: ensure that HTTP_PROBE_PATH is present when probe enabled
+    set:
+      config.LIVENESS_INITIAL_DELAY_SECONDS: 40
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 40

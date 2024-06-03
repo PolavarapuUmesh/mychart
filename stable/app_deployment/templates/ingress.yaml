@@ -1,0 +1,21 @@
+{{- if eq (toString .Values.config.INGRESS_ENABLED) "true" -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "app-deployment.fullname" . }}-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+{{ include "app-deployment.ingessAnnotations" . | indent 4 }}
+spec:
+  rules:
+  - host: {{ .Values.config.INGRESS_HOSTNAME_SUBDOMAIN }}.{{ .Values.config.INGRESS_HOSTNAME_DOMAIN }}
+    http:
+      paths:
+      - pathType: {{ .Values.config.INGRESS_PATH_TYPE }}
+        path: {{ .Values.config.INGRESS_PATH }}
+        backend:
+          service:
+            name: {{ include "app-deployment.fullname" . }}
+            port:
+              number: {{ .Values.config.KUBERNETES_SERVICE_PORT }}
+{{- end }}

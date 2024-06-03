@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app-deployment.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "app-deployment.labels" . | indent 4 }}
+{{- include "app-deployment.additionalPodLabels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.config.KUBERNETES_REPLICAS }}
+  strategy:
+    rollingUpdate:
+      maxSurge: !!int {{ .Values.config.KUBERNETES_ROLLING_UPDATE_MAX_SURGE }}
+      maxUnavailable: !!int {{ .Values.config.KUBERNETES_ROLLING_UPDATE_MAX_UNAVAILABLE }}
+    type: RollingUpdate
+  minReadySeconds: !!int {{ .Values.config.KUBERNETES_ROLLING_UPDATE_MIN_READY_SECONDS }}
+  selector:
+    matchLabels:
+{{ include "app-deployment.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "app-deployment.matchLabels" . | indent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+{{ toYaml .Values.pod.annotations | indent 8 }}
+    spec:
+      {{- if eq .Values.config.SERVICE_ACCOUNT "true"}}
+      serviceAccountName: {{ include "app-deployment.name" . }}-{{ .Release.Namespace }}-sa
+      {{- end }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+      - name: {{ include "app-deployment.fullname" . }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.bucketName }}-{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - name: http
+            containerPort: {{ .Values.config.CONTAINER_PORT }}
+            protocol: TCP
+       {{- if eq .Values.config.HTTP_PROBES_ENABLED "true"}}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.config.HTTP_PROBE_PATH }}
+            port: {{ .Values.config.CONTAINER_PORT }}
+          failureThreshold: {{ $.Values.config.LIVENESS_FAILURE_THRESHOLD }}
+          initialDelaySeconds: {{ $.Values.config.LIVENESS_INITIAL_DELAY_SECONDS }}
+          periodSeconds: {{ $.Values.config.LIVENESS_PERIOD_SECONDS }}
+          successThreshold: {{ $.Values.config.LIVENESS_SUCCESS_THRESHOLD }}
+          timeoutSeconds: {{ $.Values.config.LIVENESS_TIMEOUT_SECONDS }}
+        readinessProbe:
+          httpGet:
+            path: {{ $.Values.config.HTTP_PROBE_PATH }}
+            port: {{ $.Values.config.CONTAINER_PORT }}
+          failureThreshold: {{ $.Values.config.READINESS_FAILURE_THRESHOLD }}
+          initialDelaySeconds: {{ $.Values.config.READINESS_INITIAL_DELAY_SECONDS }}
+          periodSeconds: {{ $.Values.config.READINESS_PERIOD_SECONDS }}
+          successThreshold: {{ $.Values.config.READINESS_SUCCESS_THRESHOLD }}
+          timeoutSeconds: {{ $.Values.config.READINESS_TIMEOUT_SECONDS }}
+       {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "app-deployment.fullname" . }}
+        resources:
+          requests:
+            memory: {{ $.Values.config.RESOURCES_REQUESTS_MEMORY }}
+            cpu: {{ $.Values.config.RESOURCES_REQUESTS_CPU }}
+            ephemeral-storage: {{ $.Values.config.RESOURCES_REQUESTS_EPHEMERAL_STORAGE }}
+          limits:
+            memory: {{ $.Values.config.RESOURCES_LIMITS_MEMORY }}
+            cpu: {{ $.Values.config.RESOURCES_LIMITS_CPU }}
+            ephemeral-storage: {{ $.Values.config.RESOURCES_LIMITS_EPHEMERAL_STORAGE }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

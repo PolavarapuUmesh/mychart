@@ -1,0 +1,31 @@
+{{- if eq (toString .Values.config.HPA_ENABLED) "true" }}
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "app-deployment.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "app-deployment.fullname" . }}
+  minReplicas: {{ .Values.config.HPA_MIN_REPLICA }}
+  maxReplicas: {{ .Values.config.HPA_MAX_REPLICA }}
+  metrics:
+    {{- if .Values.config.HPA_TARGET_CPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.config.HPA_TARGET_CPU }}
+    {{- end }}
+    {{- if .Values.config.HPA_TARGET_MEMORY }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.config.HPA_TARGET_MEMORY  }}
+    {{- end }}
+{{- end }}
