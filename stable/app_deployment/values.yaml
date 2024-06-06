@@ -25,9 +25,9 @@ pod:
     "prometheus.io/port": "80"
     "prometheus.io/scrape": "true"
 image:
-  repository: 058264528338.dkr.ecr.us-east-1.amazonaws.com/snake-game
-  bucketName: snake-game
-  tag: 11
+  repository: 058264528338.dkr.ecr.us-east-1.amazonaws.com/hangman-game
+  bucketName: hangman-game
+  tag: 7
   pullPolicy: Always
 # resources:
 #   limits:
