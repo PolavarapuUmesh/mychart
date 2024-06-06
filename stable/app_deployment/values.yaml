@@ -27,7 +27,7 @@ pod:
 image:
   repository: 058264528338.dkr.ecr.us-east-1.amazonaws.com/hangman-game
   bucketName: hangman-game
-  tag: 7
+  tag: 8
   pullPolicy: Always
 # resources:
 #   limits:
