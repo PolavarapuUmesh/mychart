@@ -1,0 +1,64 @@
+{{- if .Values.config.DB_MIGRATION_COMMAND }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "app-deployment.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "app-deployment.labels" . | indent 4 }}
+{{- include "app-deployment.additionalPodLabels" . | indent 4 }}
+  annotations:
+{{ toYaml .Values.job.annotations | indent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+{{ include "app-deployment.matchLabels" . | indent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: Never
+      containers:
+        - args:
+          {{- if kindIs "string" .Values.config.DB_MIGRATION_COMMAND }}
+          - {{ .Values.config.DB_MIGRATION_COMMAND }}
+          {{- else }}
+          {{- range .Values.config.DB_MIGRATION_COMMAND }}
+          - {{ . }}
+          {{- end }}
+          {{- end }}
+          env:
+            - name: "NODE_HOST_NAME"
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          envFrom:
+            - configMapRef:
+                name: {{ include "app-deployment.fullname" . }}
+          name: {{ include "app-deployment.fullname" . }}-migrate-job
+          image: {{ .Values.image.repository }}:{{ .Values.image.bucketName }}-{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests:
+              memory: {{ $.Values.config.RESOURCES_REQUESTS_MEMORY }}
+              cpu: {{ $.Values.config.RESOURCES_REQUESTS_CPU }}
+              ephemeral-storage: {{ $.Values.config.RESOURCES_REQUESTS_EPHEMERAL_STORAGE }}
+            limits:
+              memory: {{ $.Values.config.RESOURCES_LIMITS_MEMORY }}
+              cpu: {{ $.Values.config.RESOURCES_LIMITS_CPU }}
+              ephemeral-storage: {{ $.Values.config.RESOURCES_LIMITS_EPHEMERAL_STORAGE }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end }}

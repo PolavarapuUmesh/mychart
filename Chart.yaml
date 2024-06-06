@@ -1,4 +1,5 @@
 apiVersion: v2
+<<<<<<< HEAD
 name: snake-game-app
 
 description: A Helm chart for Kubernetes
@@ -23,3 +24,9 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
+=======
+name: app-deployment
+description: A Helm chart for Deploying Application in Kubernetes Cluster 
+version: 0.2.0
+appVersion: "1.2.0"
+>>>>>>> 2045eed (change_repo_details)

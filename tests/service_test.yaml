@@ -1,0 +1,21 @@
+suite: test service
+templates:
+  - service.yaml
+tests:
+  - it: check if service is not exposed outside of the cluster
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: ClusterIP
+
+  - it: check if service listen on the right port
+    asserts:
+      - equal:
+          path: spec.ports[0]
+          value: 
+            port: 80
+            protocol: TCP
+            targetPort: 8080
+            name: http

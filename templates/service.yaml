@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 apiVersion: v1
 kind: Service
 metadata:
@@ -13,3 +14,23 @@ spec:
       name: http
   selector:
     {{- include "mychart.selectorLabels" . | nindent 4 }}
+=======
+{{- if eq .Values.app.release "stable" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app-deployment.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "app-deployment.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.config.KUBERNETES_SERVICE_PORT }}
+    protocol: TCP
+    targetPort: {{ .Values.config.CONTAINER_PORT }}
+    name: {{ .Values.config.KUBERNETES_SERVICE_NAME }}
+  selector:
+{{ include "app-deployment.selector" . | indent 4 }}
+{{- end }}
+>>>>>>> 2045eed (change_repo_details)

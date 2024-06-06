@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Default values for mychart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -106,3 +107,93 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+=======
+# Default values for app-deployment.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+app:
+  name: null
+  release: "stable"
+  team: "SRE"
+service:
+  enabled: true
+  type: "ClusterIP"
+job:
+  enabled: false
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+configmap:
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation
+pod:
+  annotations:
+    "prometheus.io/path": "/metrics"
+    "prometheus.io/port": "80"
+    "prometheus.io/scrape": "true"
+image:
+  repository: 058264528338.dkr.ecr.us-east-1.amazonaws.com/hangman-game
+  bucketName: hangman-game
+  tag: 7
+  pullPolicy: Always
+# resources:
+#   limits:
+#     cpu: 1000m
+#     memory: 384Mi
+#     ephemeral-storage: 128Mi
+#   requests:
+#     cpu: 500m
+#     memory: 128Mi
+#     ephemeral-storage: 64Mi
+nodeSelector: { }
+tolerations: [ ]
+affinity: { }
+nameOverride: ""
+fullnameOverride: ""
+imagePullSecrets:
+  - name: ecr-reg-cred
+deployment:
+  podLabels: { }
+config:
+  CONTAINER_PORT: 8080
+  HTTP_PROBES_ENABLED: "true"
+  HTTP_PROBE_PATH: "/ping"
+  RESOURCES_LIMITS_CPU: 1000m
+  RESOURCES_REQUESTS_CPU: 500m
+  RESOURCES_LIMITS_MEMORY: 1G
+  RESOURCES_REQUESTS_MEMORY: 500Mi
+  RESOURCES_LIMITS_EPHEMERAL_STORAGE: 128Mi
+  RESOURCES_REQUESTS_EPHEMERAL_STORAGE: 64Mi
+  HPA_ENABLED: "false"
+  HPA_MIN_REPLICA: 2
+  HPA_MAX_REPLICA: 10
+  HPA_TARGET_CPU: 90
+  HPA_TARGET_MEMORY: 90
+  DB_MIGRATION_COMMAND: ""
+  KUBERNETES_REPLICAS: 1
+  KUBERNETES_ROLLING_UPDATE_MAX_SURGE: 1
+  KUBERNETES_ROLLING_UPDATE_MAX_UNAVAILABLE: 1
+  KUBERNETES_ROLLING_UPDATE_MIN_READY_SECONDS: 0
+  KUBERNETES_SERVICE_PORT: 80
+  KUBERNETES_SERVICE_NAME: "http"
+  READINESS_INITIAL_DELAY_SECONDS: 30
+  LIVENESS_INITIAL_DELAY_SECONDS: 30
+  READINESS_PERIOD_SECONDS: 5
+  LIVENESS_PERIOD_SECONDS: 5
+  READINESS_TIMEOUT_SECONDS: 1
+  LIVENESS_TIMEOUT_SECONDS: 1
+  READINESS_FAILURE_THRESHOLD: 2
+  LIVENESS_FAILURE_THRESHOLD: 2
+  READINESS_SUCCESS_THRESHOLD: 1
+  LIVENESS_SUCCESS_THRESHOLD: 1
+  INGRESS_ENABLED: "false"
+  INGRESS_TYPE: "internal"
+  INGRESS_HOSTNAME_SUBDOMAIN: ""
+  INGRESS_HOSTNAME_DOMAIN: ""
+  INGRESS_PATH_TYPE: "ImplementationSpecific"
+  INGRESS_PATH: "/"
+  SERVICE_ACCOUNT: "false"
+>>>>>>> 2045eed (change_repo_details)

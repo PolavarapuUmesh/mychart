@@ -1,0 +1,24 @@
+suite: test configmap
+templates:
+  - configmap.yaml
+tests:
+  - it: check configmap labels
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - isNotNull:
+          path: metadata.labels
+  
+  - it: check configmap data key value
+    set:
+      config.TEST: test
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - isNotNull:
+          path: data
+      - equal:
+          path: data.TEST
+          value: test
+  
+

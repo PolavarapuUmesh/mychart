@@ -1,0 +1,22 @@
+suite: test job
+templates:
+  - job.yaml
+tests:
+  - it: check job enabled by default
+    set:
+      config.DB_MIGRATION_COMMAND: "migrate"
+    asserts:
+      - isKind:
+          of: Job
+      - isAPIVersion: 
+          of: batch/v1
+      - isNotEmpty:
+          path: spec
+
+  - it: check migration command if job enabled
+    set:
+      config.DB_MIGRATION_COMMAND: "migrate"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: migrate
